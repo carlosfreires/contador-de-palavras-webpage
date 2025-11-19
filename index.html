@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contador de Palavras</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cor-principal: #4361ee;
+      --fundo: #f8f9fa;
+      --borda-arredondada: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Poppins", sans-serif; background: var(--fundo); display: flex; justify-content: center; align-items: center; height: 100vh; }
+    main { background: var(--cor-principal); color: #fff; padding: 2rem; border-radius: var(--borda-arredondada); box-shadow: 0 4px 16px rgba(0,0,0,0.15); width: min(90%, 600px); }
+    textarea, button { width: 100%; margin-top: 1rem; padding: .75rem; border: none; border-radius: var(--borda-arredondada); font-size: 1rem; }
+    textarea { resize: none; height: 120px; }
+    button { background: #fff; color: var(--cor-principal); font-weight: 600; cursor: pointer; transition: .3s; }
+    button:hover { background: #e9ecef; }
+    #resultado { margin-top: 1rem; background: #fff; color: #333; padding: 1rem; border-radius: var(--borda-arredondada); max-height: 200px; overflow-y: auto; }
+    hr { border: none; height: 1px; background: rgba(0,0,0,0.06); margin: 0.75rem 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Contador de Palavras</h1>
+    <textarea id="entradaTexto" placeholder="Digite ou cole o texto aqui..."></textarea>
+    <button id="botaoAnalisar">Analisar Texto</button>
+    <div id="resultado" aria-live="polite"></div>
+  </main>
+
+  <script>
+    const entradaTexto = document.getElementById('entradaTexto');
+    const botaoAnalisar = document.getElementById('botaoAnalisar');
+    const resultado = document.getElementById('resultado');
+
+    const palavrasComuns = new Set([
+      'a','o','e','de','do','da','em','que','por','para','com',
+      'um','uma','sao','são','nao','não','mas','foi','ser','os','as','na','no'
+    ]);
+
+    botaoAnalisar.addEventListener('click', () => {
+      const textoOriginal = entradaTexto.value;
+
+      if (!textoOriginal.trim()) {
+        resultado.innerHTML = '<p>Por favor, insira algum texto.</p>';
+        return;
+      }
+
+      const textoNormalizado = textoOriginal
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+      const textoLimpo = textoNormalizado.replace(/[^\p{L}\s]/gu, '').trim();
+
+      const todasAsPalavras = textoLimpo.split(/\s+/).filter(Boolean);
+      const totalPalavras = todasAsPalavras.length;
+
+      const palavrasFiltradas = todasAsPalavras.filter(p => !palavrasComuns.has(p));
+
+      const frequencia = new Map();
+      for (const palavra of palavrasFiltradas) {
+        frequencia.set(palavra, (frequencia.get(palavra) || 0) + 1);
+      }
+
+      const ordenadas = Array.from(frequencia.entries()).sort((a, b) => b[1] - a[1]);
+
+      let saidaHTML = `<p><strong>Total de palavras:</strong> ${totalPalavras}</p>`;
+
+      if (ordenadas.length > 0) {
+        saidaHTML += '<hr>';
+        saidaHTML += ordenadas.slice(0, 100).map(([palavra, contagem]) => `\n  <p><strong>${palavra}</strong>: ${contagem}</p>`).join('');
+      } else if (totalPalavras > 0) {
+        saidaHTML += '<p>(Todas as palavras foram filtradas por serem muito comuns.)</p>';
+      } else {
+        saidaHTML = '<p>Nenhuma palavra válida foi encontrada.</p>';
+      }
+
+      resultado.innerHTML = saidaHTML;
+    });
+  </script>
+</body>
+</html>
