@@ -240,7 +240,7 @@ Cada uma dessas atividades é um bom exercício prático para consolidar conceit
 
 ## 9. `index.html`
 
-> Abaixo está o arquivo `index.html` com a implementação corrigida, comentada e pronta para uso. Copie e cole em um arquivo `index.html` e abra no navegador.
+> Abaixo está o arquivo `index.html` comentado. Copie e cole em um arquivo `index.html` e abra no navegador.
 
 ```html
 <!DOCTYPE html>
